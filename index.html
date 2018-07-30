@@ -1,0 +1,488 @@
+<html>
+<head> 
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+</head>
+<body>
+
+<div align="center" >
+	<h2>How are film ratings within the Star Trek film series affected by the number of films rated? </h2>
+	<div id="content" style="width: 750px"></div><br>
+	<div >
+		<div id="navigaion" align="center">
+		<button id="combinebtn" onclick="buildCombined()">1. Combined</button>
+		<button id="casualbtn" onclick="buildCasual()">2. Casuals</button>
+		<button id="mediumbtn" onclick="buildMedium()">3. Mediums </button>
+		<button id="superbtn" onclick="buildSuper()">4. Supers</button>
+		<button id="cohortbtn"  onclick="buildAll()" >5. Cohorts  </button>	
+		<button onclick="nextSlide()" >Next >>  </button>	
+	</div><br>
+	<br>
+	<div style="width:750px; height:2px; background-color: grey;"></div>
+
+</div>
+<br>
+</div>
+<div align="center">
+	<div align="center"> 
+		<div id="captainParams" style=" visibility: hidden;">
+			Filter Movies by Lead Actor:
+			<form id="captainsFRM">
+				<input type="radio" name="captainRDO" value="William Shatner">William Shatner
+				<input type="radio" name="captainRDO" value="Patrick Stewart">Patrick Stewart
+				<input type="radio" name="captainRDO" value="Chris Pine">Chris Pine
+			</form>
+		</div>
+	</div>
+	<div align="center" id="visual" ></div>
+	<button onclick="viewAbout()">About the Visualization</button><br><br>
+	<div id ="about" align="center"  style="width: 800px; visibility: hidden;" >
+		<h1>About the Visualization:</h1>
+
+		<p>
+		The main hybrid structured followed in this visual presentation is the Interactive Slideshow. The main question is how are film ratings within the Star Trek film series affected by the number of films rated? The user is being led through the changing of the ratings as the number of films rated increases.  There are 13 films in the series and 3 cohorts were chosen based on the number of films rated. The casuals cohort is defined as those who have rated 1-4 of the films in the series. The mediums and supers cohorts are defined as those who have rated 5-8 and 9-13 films respectively. Each cohort is given a unique color and the charts maintain those colors across the scenes. The basic chart remains the same with the axis and order of films remaining exact so that the user does not become disoriented.  Each scene has interactive elements such as the ability to filter based on the lead actor who played the captain in the film. This is something that is discussed a lot when people debate the best films in the series.
+		</p><p>
+		The scenes are meant to convey the average rating across the cohorts and to see what differences can be uncovered.  We begin with the combined average rating of all ratings to establish a baseline for the best and worst films in the series. Position of the films is maintained throughout the scene transitions to help highlight the differences. The casual cohort is the first cohort presented and the best and worst films as rated by this cohort are highlighted.. This is followed by the medium and super cohorts in the same format. The final scene combines the average ratings into one grouped bar chart so that the user can further explore the differences film by film.
+		</p><p>
+		Annotations are used to call out the best and worst films in the series within the cohorts. The 3 cohort slides have the annotations clearly attached to the appropriate films and the shift of the best film can be seen as you move from mediums to supers. The final chart doesn't have the best and worst film annotated on purpose as the user is encouraged to discover other changes in the average ratings with each film.
+		</p><p>
+		The main parameters are the cohort filters that are used to create the bar charts. The user is also able to filter based on the lead actor who plays the captain. The captain filter is cleared between scenes
+		</p><p>
+		The triggers are clearly labeled and effective alter the scenes. The slide identifiers change the slide and draw the appropriate charts and annotations and populate the tooltips. The captain filters also adjust the visual as expected.
+		</p>
+
+		Data source: 
+		https://grouplens.org/datasets/movielens/ <br>
+		*166,687 Star Trek ratings
+	</div>
+	<br>	
+</div>
+
+
+
+
+
+	
+<script>
+
+/*
+var allCohort = [
+				{year:'1979', series:'I', title:'Star Trek: The Motion Picture ',combined: 3.091 , casuals:3.030 , mediums: 3.115, supers: 3.141, captain: 'William Shatner'},
+				{year:'1982', series:'II', title:'Star Trek II: The Wrath of Khan', combined: 3.684 ,casuals: 3.472 ,mediums: 3.821, supers: 3.987, captain: 'William Shatner'},
+				{year:'1984', series:'III', title:'Star Trek III: The Search for Spock ', combined: 3.233 ,casuals:3.059 , mediums: 3.296, supers: 3.367, captain: 'William Shatner'},
+				{year:'1986', series:'IV', title:'Star Trek IV: The Voyage Home', combined: 3.459 ,casuals: 3.240,  mediums: 3.577, supers: 3.700, captain: 'William Shatner'},
+				{year:'1989', series:'V', title:'Star Trek V: The Final Frontier', combined: 2.869 ,casuals:2.979 , mediums: 2.859, supers: 2.787, captain: 'William Shatner'},
+				{year:'1991', series:'VI', title:'Star Trek VI: The Undiscovered Country',combined: 3.296, casuals:3.091 , mediums: 3.341, supers: 3.512, captain: 'William Shatner'},
+				{year:'1994', series:'VII', title:'Star Trek: Generations', combined: 3.344 ,casuals: 3.356 , mediums: 3.297, supers: 3.333, captain: 'Patrick Stewart'},
+				{year:'1996', series:'VIII', title:'Star Trek: First Contact', combined: 3.666,casuals: 3.620, mediums: 3.691 , supers: 3.806, captain: 'Patrick Stewart'},
+				{year:'1998', series:'IX', title:'Star Trek: Insurrection', combined: 3.191 ,casuals:3.135 , mediums: 3.259, supers: 3.216, captain: 'Patrick Stewart'},
+				{year:'2002', series:'X', title:'Star Trek: Nemesis', combined: 3.135, casuals:3.100 , mediums: 3.144, supers: 3.153, captain: 'Patrick Stewart'},
+				{year:'2009', series:' XI', title:'Star Trek', combined: 3.872,casuals: 3.854 ,mediums: 3.931, supers: 3.984, captain: 'Chris Pine'},
+				{year:'2013', series:'XII', title:'Star Trek: Into Darkness',combined: 3.766 ,casuals: 3.788, mediums: 3.746, supers: 3.644, captain: 'Chris Pine'},
+				{year:'2016', series:'XIII', title:'Star Trek: Beyond ',combined: 3.564 ,casuals: 3.574 ,mediums: 3.613, supers: 3.496, captain: 'Chris Pine'},
+			]	
+
+*/	
+var allCohort = [				
+				{year:'2009', series:' XI', title:'Star Trek', combined: 3.872,casuals: 3.854 ,mediums: 3.931, supers: 3.984, captain: 'Chris Pine'},
+				{year:'2013', series:'XII', title:'Star Trek: Into Darkness',combined: 3.766 ,casuals: 3.788, mediums: 3.746, supers: 3.644, captain: 'Chris Pine'},
+				{year:'1982', series:'II', title:'Star Trek II: The Wrath of Khan', combined: 3.684 ,casuals: 3.472 ,mediums: 3.821, supers: 3.987, captain: 'William Shatner'},
+				{year:'1996', series:'VIII', title:'Star Trek: First Contact', combined: 3.666,casuals: 3.620, mediums: 3.691 , supers: 3.806, captain: 'Patrick Stewart'},
+				{year:'2016', series:'XIII', title:'Star Trek: Beyond ',combined: 3.564 ,casuals: 3.574 ,mediums: 3.613, supers: 3.496, captain: 'Chris Pine'},
+				{year:'1986', series:'IV', title:'Star Trek IV: The Voyage Home', combined: 3.459 ,casuals: 3.240,  mediums: 3.577, supers: 3.700, captain: 'William Shatner'},
+				{year:'1994', series:'VII', title:'Star Trek: Generations', combined: 3.344 ,casuals: 3.356 , mediums: 3.297, supers: 3.333, captain: 'Patrick Stewart'},
+				{year:'1991', series:'VI', title:'Star Trek VI: The Undiscovered Country',combined: 3.296, casuals:3.091 , mediums: 3.341, supers: 3.512, captain: 'William Shatner'},
+				{year:'1984', series:'III', title:'Star Trek III: The Search for Spock ', combined: 3.233 ,casuals:3.059 , mediums: 3.296, supers: 3.367, captain: 'William Shatner'},
+				{year:'1998', series:'IX', title:'Star Trek: Insurrection', combined: 3.191 ,casuals:3.135 , mediums: 3.259, supers: 3.216, captain: 'Patrick Stewart'},
+				{year:'2002', series:'X', title:'Star Trek: Nemesis', combined: 3.135, casuals:3.100 , mediums: 3.144, supers: 3.153, captain: 'Patrick Stewart'},
+				{year:'1979', series:'I', title:'Star Trek: The Motion Picture ',combined: 3.091 , casuals:3.030 , mediums: 3.115, supers: 3.141, captain: 'William Shatner'},
+				{year:'1989', series:'V', title:'Star Trek V: The Final Frontier', combined: 2.869 ,casuals:2.979 , mediums: 2.859, supers: 2.787, captain: 'William Shatner'},			
+			]
+var data = allCohort;
+var cohortNames = ['casuals', 'mediums', 'supers']
+
+allCohort.forEach(function(d) {
+    d.cohortRatings = cohortNames.map(function(name) {
+			return {
+				name: name,
+				value: d[name]
+			};
+    });
+});
+
+var currentSlide = 'open';
+
+function buildCombined(){
+	cleanUp()
+	currentSlide = 'combined';
+	buildVisual(allCohort, 'combined' ,"#FFD761");
+	d3.select("#content").html(' Here we will establish a baseline of ratings among all film voters by listing the films from best to worst based on the combined average rating. Will the best or worst film change based on the number of films voted on?');
+}
+
+
+function buildCasual(){
+	cleanUp()
+	currentSlide = 'casuals';
+	buildVisual(allCohort, 'casuals' ,"#4c8aed");
+	d3.select("#content").html(' Casual voters have seen 1-4 movies. The best and the worst film in the series remains the same but a number of films shift places. This includes Star Trek II: The Wrath of Khan which has fallen  two spots with the casual cohort.');
+}			
+function buildMedium(){
+	cleanUp()
+	currentSlide = 'mediums';
+	buildVisual(allCohort, 'mediums', "#ffa755");
+	d3.select("#content").html(' Medium voters have seen 5-8 movies. The best and worst film remain the same but Star Trek II: The Wrath of Khan is now the second best film.');
+	
+}
+function buildSuper(){
+	cleanUp()
+	currentSlide = 'supers';
+	buildVisual(allCohort, 'supers', "#9fcc6f");	
+	d3.select("#content").html('Super viewers have seen 9-13 movies.Star Trek II: The Wrath of Khan is now the best rated film. Star Trek IV: The Voyage Home has also jumped two spots.');
+}
+function buildAll(){
+	cleanUp()
+	currentSlide = 'final';	
+	buildGroupVisual(allCohort);
+	d3.select("#content").html('The number of films voted on does affect the film ratings and can change the order of the film rankings. Here we can compare individual films ratings by each cohort.	')
+}
+
+
+var indent = 30;
+var w = 750;
+var h = 400;
+
+
+
+var tip = d3.select("body").append("div")
+				.style("position", "absolute")
+				.style("visibility", "hidden")
+				.style("border-style", "solid")
+				.style("border-width", "thin")
+				.style("background-color", "white")
+
+function buildVisual( data ,cohort ,color , captain ){
+	var root = this;
+	var xScale = d3.scaleBand()
+					.domain(data.map(function(d) { return d.series; }))
+					.rangeRound([(indent),(w)]).padding(.1);
+
+					
+	var yScale = d3.scaleLinear()
+					.domain([0,4])
+					.range([h -30 ,100]);
+		
+	var yAxis = d3.axisLeft().scale(yScale)
+	var xAxis = d3.axisBottom().scale(xScale)
+				
+				
+	var svg = d3.select("#visual").append("svg").attr("width", w).attr("height", h)
+
+	var bars = svg.selectAll("rect").data(data).enter()
+	
+	
+	//grey bars
+	bars.append("rect")
+		.attr("width", 40)
+		.attr("height", function(d) {return  (h - indent) - yScale(d[cohort]);})
+		.attr("x", function(d,i) {return xScale(d.series);})
+		.attr("y", function(d) {return yScale(d[cohort]);} )
+		.style("fill", "grey")
+		.style("opacity", 0.2)
+
+	
+	//color bars
+	bars.append("rect").filter(function(d) { 			
+				if (captain){
+					return d.captain == captain;  
+				}else{
+					return true;
+				}	  
+			})
+		.attr("width", 40)
+		.attr("height", function(d) {return  (h - indent) - yScale(d[cohort]);})
+		.attr("x", function(d,i) {return xScale(d.series);})
+		.attr("y", function(d) {return yScale(d[cohort]);} )
+		.style("fill", color )
+		.on("mouseover", function(d) 
+						{	
+						return tip.style("visibility", "visible")
+								.html('<span>Title: '+ d.title +
+								'</span><br><span>Rating: '+ d[cohort]  +
+								'</span><br><span>Captain: '+ d.captain +'</span>' );	
+						
+						})
+		.on("mousemove", function(){return tip.style("top", (d3.event.pageY-35)+"px").style("left",(d3.event.pageX+10)+"px");})
+		.on("mouseout", function(){return tip.style("visibility", "hidden");});
+
+
+	//texts
+	var texts = svg.selectAll("text").data(data).enter()
+	
+	texts.append("text").text(function(d){ return root.highlight(d[cohort]);})
+		.attr("x", function(d,i){return xScale(d.series); })
+		.attr("y", function(d) {return  yScale(d[cohort]) - 80 ;})
+		.style("fill", "black")
+		.style("font-weight", "bold")
+	
+	texts.append("text").text(function(d){ return cohort + " avg. ratings";})
+		.attr("x", 300 )
+		.attr("y", 20)
+		.style("font", "20px arial, sans-serif")
+		.style("text-decoration", "underline")
+		
+	//tip bar
+	bars.append("rect")
+		.attr("width", 60)
+		.attr("height", 3)
+		.attr("x", function(d,i){return xScale(d.series); })
+		.attr("y", function(d) {return  yScale(d[cohort]) - 80 ;})
+		.attr("fill", "black")
+		.style("opacity", function(d){ return root.fillOpacity(d[cohort]);})	
+	
+	//tip line
+	var lines = svg.selectAll("line").data(data).enter()
+	
+	lines.append("line")          
+		.style("stroke", "black")
+		.style("opacity", function(d){ return root.fillOpacity(d[cohort]);})		
+		.attr("x1", function(d,i){return xScale(d.series);})     
+		.attr("y1",  function(d) {return  yScale(d[cohort]) - 80 ;})     
+		.attr("x2", function(d,i){return xScale(d.series) + 20;})    
+		.attr("y2",  function(d) {return  yScale(d[cohort]) + 10 ;});
+		
+	//tip dots	
+	var circles = svg.selectAll("circle").data(data).enter()
+	
+	circles.append("circle")        
+		.style("stroke", "black")	
+		.style("opacity", function(d){ return root.fillOpacity(d[cohort]);})	
+		.attr("cx", function(d,i){return xScale(d.series) + 20;})     
+		.attr("cy",  function(d) {return  yScale(d[cohort]) + 10  ;})     
+		.attr("r",  8)
+		   
+
+	
+	svg.append("g").call(yAxis)
+		.attr("transform", "translate("+ indent +", 0)")
+		.selectAll("text")
+		.style("font-size", "16px")
+	svg.append("g").call(xAxis)
+		.attr("transform", "translate(0, "+ (h - indent ) +")")
+		.selectAll("text")
+		.style("font-size", "16px")
+		//.attr("y", 0)
+		//.attr("x", -35)
+		//.attr("transform", "rotate(-60)")
+		//.style("text-anchor", "start");
+		
+	
+}
+
+function buildGroupVisual( data , captain ){
+	var root = this;					
+	var yScale = d3.scaleLinear()
+					.domain([0,4])
+					.range([h -30 ,100]);
+	
+
+	var x0 = d3.scaleBand().rangeRound([indent, w]).padding(.1);
+	var x1 = d3.scaleBand().padding(.1);
+
+	x0.domain(data.map(function(d) { return d.series;}));
+	x1.domain(cohortNames).rangeRound([0, x0.bandwidth()]);
+	
+	var xAxis = d3.axisBottom().scale(x0)
+	var yAxis = d3.axisLeft().scale(yScale)
+
+	var color = d3.scaleOrdinal()
+					.range(["#4c8aed", "#ffa755", "#9fcc6f"]);
+				
+	var svg = d3.select("#visual").append("svg").attr("width", w).attr("height", h);
+	
+	//fill grey
+	svg.append("g").selectAll("g").data(data).enter().append("g")
+		.attr("transform", function(d) { return "translate(" + x0(d.series) + ",0)"; })
+	
+		.selectAll("rect").data(function(d) {return d.cohortRatings;}).enter().append("rect")
+		.attr("width", x1.bandwidth())
+		.attr("height", function(d) {return  (h - indent) - yScale(d.value);})
+		.attr("x", function(d,i) {return x1(d.name);})
+		.attr("y", function(d) {return yScale(d.value);} )
+		.style("fill", "grey")
+		.style("opacity", 0.2)
+
+
+	//fill colors
+	svg.append("g").selectAll("g").data(data).enter().append("g")
+		.filter(function(d) { 
+			if (captain){
+				return d.captain == captain;  
+			}else{
+				return true;
+			}	
+		})
+		.attr("transform", function(d) { return "translate(" + x0(d.series) + ",0)"; })
+		.on("mouseover", function(d) 
+						{	
+						return tip.style("visibility", "visible")
+								.html('<span>Title: '+ d.title +
+								'</span><br><span>Casuals: '+ d['casuals'] +
+								'</span><br><span>Medium: '+ d['mediums'] +
+								'</span><br><span>Supers: '+ d['supers'] +
+								'</span><br><span>Captain: '+ d.captain +'</span>' );	
+						})
+		.on("mousemove", function(){return tip.style("top", (d3.event.pageY-35)+"px").style("left",(d3.event.pageX+10)+"px");})
+		.on("mouseout", function(){return tip.style("visibility", "hidden");})
+		.selectAll("rect").data(function(d) {return d.cohortRatings;}).enter().append("rect")
+		.attr("width", x1.bandwidth())
+		.attr("height", function(d) {return  (h - indent) - yScale(d.value);})
+		.attr("x", function(d,i) {return x1(d.name);})
+		.attr("y", function(d) {return yScale(d.value);} )
+		.style("fill", function(d) { return color(d.name);});
+/*
+	svg.selectAll("text").data(data).enter().append("text")
+		.text(function(d){ return root.highlight(d.rating);})
+		.attr("x", function(d,i){return xScale(d.title); })
+		.attr("y", function(d) {return  yScale(d.rating);})
+*/
+	svg.selectAll("text").data(data).enter().append("text")
+		.text(function(d){ return "cohort avg. ratings";})
+		.attr("x", 300 )
+		.attr("y", 20)
+		.style("font", "20px arial, sans-serif")
+		.style("text-decoration", "underline")
+
+	svg.append("g").call(yAxis)
+		.attr("transform", "translate("+ indent +", 0)")
+		.selectAll("text")
+		.style("font-size", "16px")
+	svg.append("g").call(xAxis)
+		.attr("transform", "translate(0, "+ (h - indent) +")")
+		.selectAll("text")
+		.style("font-size", "16px")
+		
+	var cohortLegend = svg.append("g").selectAll("g").data(cohortNames).enter()
+					.append("g")
+					.attr("transform", function(d, i) { return "translate(0," + i * 15 + ")"; });	
+	
+	cohortLegend.append("rect")
+			.attr('width', 15)
+			.attr('height', 15)
+			.attr('x', w - 80)
+			.style('fill',function(d){return color(d)} )
+	cohortLegend.append("text")
+			.attr('x', w-60)
+			.attr('y', 10)
+			.text(function(d){return d})
+		
+	
+}
+
+
+
+
+function highlight(rating){
+	var best = d3.max(allCohort, function(d) { return d[currentSlide];}) ;
+	var worst = d3.min(allCohort, function(d) { return d[currentSlide];}) ;
+	 
+	if (rating == best ){
+		return  "Best!" 
+	}else if (rating == worst){
+		return "Worst!"
+	}
+}
+
+function fillOpacity(rating){
+	var best = d3.max(allCohort, function(d) { return d[currentSlide];}) ;
+	var worst = d3.min(allCohort, function(d) { return d[currentSlide];}) ;
+	 
+	if (rating == best ){
+		return  0.5 
+	}else if (rating == worst){
+		return 0.5
+	}else{
+		return 0
+	}
+}
+
+function captainFilter(){
+	var captainName = d3.select('input[name="captainRDO"]:checked').node().value
+	d3.select("svg").remove();
+	switch(currentSlide) {
+		case 'combined':
+			buildVisual(allCohort, 'combined' ,"grey", captainName);
+			break;
+		case 'casuals':
+			buildVisual(allCohort, 'casuals' ,"#4c8aed", captainName);
+			break;
+		case 'mediums':
+			buildVisual(allCohort, 'mediums', "#ffa755", captainName);
+			break;
+		case 'supers':
+			buildVisual(allCohort, 'supers', "#9fcc6f", captainName);
+			break;
+		case 'final':
+			buildGroupVisual(allCohort, captainName);
+			break;
+		default:
+			buildVisual(allCohort, 'casuals' ,"#4c8aed", captainName);
+	}
+}
+
+
+
+var captainListener = d3.select("#captainsFRM")
+						.on("change", captainFilter)
+
+
+function cleanUp(){
+	d3.select("svg").remove();
+	if (d3.select('input[name="captainRDO"]:checked').node()){
+		d3.select('input[name="captainRDO"]:checked').node().checked = false;
+	}
+	d3.select("#captainParams").style('visibility', 'visible');
+	d3.select("#content").html('');
+	d3.select("#about").style('visibility', 'hidden');
+}
+
+function viewAbout(){
+	d3.select("svg").remove();
+	d3.select("#captainParams").style('visibility', 'hidden');
+	d3.select("#content").html('');
+	d3.select("#about").style('visibility', 'visible');
+}
+
+
+buildCombined();
+
+function nextSlide(){
+	switch(currentSlide) {
+		case 'combined':
+			buildCasual();
+			break;
+		case 'casuals':
+			buildMedium();
+			break;
+		case 'mediums':
+			buildSuper();
+			break;
+		case 'supers':
+			buildAll();
+			break;
+		case 'final':
+			buildAll();
+			break;
+		default:
+			buildCombined();
+	}
+
+
+
+}
+
+
+</script>
+
+
+</body>
+</html>
