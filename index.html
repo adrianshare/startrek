@@ -34,7 +34,7 @@
 			</form>
 		</div>
 	</div>
-	<div align="center" id="visual" ></div>
+	<div align="center" id="visual" ></div><br><br>
 	<button onclick="viewAbout()">About the Visualization</button><br><br>
 	<div id ="about" align="center"  style="width: 800px; visibility: hidden;" >
 		<h1>About the Visualization:</h1>
@@ -64,25 +64,7 @@
 
 	
 <script>
-
-/*
-var allCohort = [
-				{year:'1979', series:'I', title:'Star Trek: The Motion Picture ',combined: 3.091 , casuals:3.030 , mediums: 3.115, supers: 3.141, captain: 'William Shatner'},
-				{year:'1982', series:'II', title:'Star Trek II: The Wrath of Khan', combined: 3.684 ,casuals: 3.472 ,mediums: 3.821, supers: 3.987, captain: 'William Shatner'},
-				{year:'1984', series:'III', title:'Star Trek III: The Search for Spock ', combined: 3.233 ,casuals:3.059 , mediums: 3.296, supers: 3.367, captain: 'William Shatner'},
-				{year:'1986', series:'IV', title:'Star Trek IV: The Voyage Home', combined: 3.459 ,casuals: 3.240,  mediums: 3.577, supers: 3.700, captain: 'William Shatner'},
-				{year:'1989', series:'V', title:'Star Trek V: The Final Frontier', combined: 2.869 ,casuals:2.979 , mediums: 2.859, supers: 2.787, captain: 'William Shatner'},
-				{year:'1991', series:'VI', title:'Star Trek VI: The Undiscovered Country',combined: 3.296, casuals:3.091 , mediums: 3.341, supers: 3.512, captain: 'William Shatner'},
-				{year:'1994', series:'VII', title:'Star Trek: Generations', combined: 3.344 ,casuals: 3.356 , mediums: 3.297, supers: 3.333, captain: 'Patrick Stewart'},
-				{year:'1996', series:'VIII', title:'Star Trek: First Contact', combined: 3.666,casuals: 3.620, mediums: 3.691 , supers: 3.806, captain: 'Patrick Stewart'},
-				{year:'1998', series:'IX', title:'Star Trek: Insurrection', combined: 3.191 ,casuals:3.135 , mediums: 3.259, supers: 3.216, captain: 'Patrick Stewart'},
-				{year:'2002', series:'X', title:'Star Trek: Nemesis', combined: 3.135, casuals:3.100 , mediums: 3.144, supers: 3.153, captain: 'Patrick Stewart'},
-				{year:'2009', series:' XI', title:'Star Trek', combined: 3.872,casuals: 3.854 ,mediums: 3.931, supers: 3.984, captain: 'Chris Pine'},
-				{year:'2013', series:'XII', title:'Star Trek: Into Darkness',combined: 3.766 ,casuals: 3.788, mediums: 3.746, supers: 3.644, captain: 'Chris Pine'},
-				{year:'2016', series:'XIII', title:'Star Trek: Beyond ',combined: 3.564 ,casuals: 3.574 ,mediums: 3.613, supers: 3.496, captain: 'Chris Pine'},
-			]	
-
-*/	
+	
 var allCohort = [				
 				{year:'2009', series:' XI', title:'Star Trek', combined: 3.872,casuals: 3.854 ,mediums: 3.931, supers: 3.984, captain: 'Chris Pine'},
 				{year:'2013', series:'XII', title:'Star Trek: Into Darkness',combined: 3.766 ,casuals: 3.788, mediums: 3.746, supers: 3.644, captain: 'Chris Pine'},
@@ -116,6 +98,8 @@ function buildCombined(){
 	cleanUp()
 	currentSlide = 'combined';
 	buildVisual(allCohort, 'combined' ,"#FFD761");
+	d3.selectAll("button").style("background-color", "#c8c8c8")
+	d3.select("#combinebtn").style("background-color", "#B0B0B0")
 	d3.select("#content").html(' Here we will establish a baseline of ratings among all film voters by listing the films from best to worst based on the combined average rating. Will the best or worst film change based on the number of films voted on?');
 }
 
@@ -124,11 +108,15 @@ function buildCasual(){
 	cleanUp()
 	currentSlide = 'casuals';
 	buildVisual(allCohort, 'casuals' ,"#4c8aed");
+	d3.selectAll("button").style("background-color", "#c8c8c8")
+	d3.select("#casualbtn").style("background-color", "#B0B0B0")
 	d3.select("#content").html(' Casual voters have seen 1-4 movies. The best and the worst film in the series remains the same but a number of films shift places. This includes Star Trek II: The Wrath of Khan which has fallen  two spots with the casual cohort.');
 }			
 function buildMedium(){
 	cleanUp()
 	currentSlide = 'mediums';
+	d3.selectAll("button").style("background-color", "#c8c8c8")
+	d3.select("#mediumbtn").style("background-color", "#B0B0B0")
 	buildVisual(allCohort, 'mediums', "#ffa755");
 	d3.select("#content").html(' Medium voters have seen 5-8 movies. The best and worst film remain the same but Star Trek II: The Wrath of Khan is now the second best film.');
 	
@@ -136,18 +124,22 @@ function buildMedium(){
 function buildSuper(){
 	cleanUp()
 	currentSlide = 'supers';
+	d3.selectAll("button").style("background-color", "#c8c8c8")
+	d3.select("#superbtn").style("background-color", "#B0B0B0")
 	buildVisual(allCohort, 'supers', "#9fcc6f");	
 	d3.select("#content").html('Super viewers have seen 9-13 movies.Star Trek II: The Wrath of Khan is now the best rated film. Star Trek IV: The Voyage Home has also jumped two spots.');
 }
 function buildAll(){
 	cleanUp()
-	currentSlide = 'final';	
+	currentSlide = 'final';
+	d3.selectAll("button").style("background-color", "#c8c8c8")
+	d3.select("#cohortbtn").style("background-color", "#B0B0B0")	
 	buildGroupVisual(allCohort);
 	d3.select("#content").html('The number of films voted on does affect the film ratings and can change the order of the film rankings. Here we can compare individual films ratings by each cohort.	')
 }
 
 
-var indent = 30;
+var indent = 35;
 var w = 750;
 var h = 400;
 
@@ -229,6 +221,13 @@ function buildVisual( data ,cohort ,color , captain ){
 		.attr("y", 20)
 		.style("font", "20px arial, sans-serif")
 		.style("text-decoration", "underline")
+	  // text label for the y axis
+
+		
+	texts.append("text").text("Film Number in Series.")
+		.attr("x", 300 )
+		.attr("y", 400)
+		//.style("font", "10px arial, sans-serif")
 		
 	//tip bar
 	bars.append("rect")
@@ -345,12 +344,18 @@ function buildGroupVisual( data , captain ){
 		.attr("x", function(d,i){return xScale(d.title); })
 		.attr("y", function(d) {return  yScale(d.rating);})
 */
-	svg.selectAll("text").data(data).enter().append("text")
+	var texts = svg.selectAll("text").data(data).enter()
+	
+	texts.append("text")
 		.text(function(d){ return "cohort avg. ratings";})
 		.attr("x", 300 )
 		.attr("y", 20)
 		.style("font", "20px arial, sans-serif")
 		.style("text-decoration", "underline")
+	
+	texts.append("text").text("Film Number in Series.")
+		.attr("x", 300 )
+		.attr("y", 400)
 
 	svg.append("g").call(yAxis)
 		.attr("transform", "translate("+ indent +", 0)")
@@ -410,7 +415,7 @@ function captainFilter(){
 	d3.select("svg").remove();
 	switch(currentSlide) {
 		case 'combined':
-			buildVisual(allCohort, 'combined' ,"grey", captainName);
+			buildVisual(allCohort, 'combined' ,"#FFD761", captainName);
 			break;
 		case 'casuals':
 			buildVisual(allCohort, 'casuals' ,"#4c8aed", captainName);
